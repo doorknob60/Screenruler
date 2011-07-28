@@ -1,0 +1,2 @@
+Requirements: zenity
+How to compile: gcc screenruler.c -lX11 -lm -o screenruler
