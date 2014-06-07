@@ -1,5 +1,11 @@
 /*
-   Screenruler 1.1
+   Screenruler 2.0
+
+   + Updated to use Gtk instead of system("zenity...")
+     by Steven Honeyman <stevenhoneyman at gmail com>
+
+   Compile using: gcc screenruler.c -Os -s `pkg-config gtk+-3.0 --cflags` `pkg-config gtk+-3.0 --libs` -lX11 -lm -o screenruler
+
    Copyright (C) 2010 by Austin Beatty <doorknob60 at gmail dot com>
 
    (Copyright for functions to grab X and Y mouse coordinates):
@@ -24,14 +30,24 @@
    THE SOFTWARE.
    */
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<X11/Xlib.h>
-#include<math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <X11/Xlib.h>
+#include <math.h>
+#include <gtk/gtk.h>
+
+void msgbox(const gchar* message)
+{
+	GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, message);
+	gtk_window_set_title (GTK_WINDOW (dialog), "Screenruler 2.0");
+	gtk_dialog_run (GTK_DIALOG (dialog));
+	gtk_widget_destroy (dialog);
+}
 
 int main(int argc, char *argv[])
 {
-	system("zenity --info --text=\"Press enter for first mouse position\"");
+	gtk_init (&argc, &argv);
+	msgbox("Press enter for first mouse position");
 
 	XEvent e;
 	Display *d = XOpenDisplay(NULL);
@@ -50,9 +66,9 @@ int main(int argc, char *argv[])
 	int y1 = e.xbutton.y;
 
 	XCloseDisplay(d);
-	
-	system("zenity --info --text=\"Press enter for second mouse position\"");
-	
+
+	msgbox("Press enter for second mouse position");
+
 	XEvent f;
 	Display *g = XOpenDisplay(NULL);
 
@@ -74,8 +90,8 @@ int main(int argc, char *argv[])
 	int xc = abs(x1-x2);
 	int yc = abs(y1-y2);
 	float change = sqrt(xc*xc+yc*yc);
-	char command[512];
-	sprintf(command, "zenity --info --text=\"X Change: %d pixels\\nY Change: %d pixels\\nTotal Change: %f pixels\"", xc, yc, change);
-	system((char *)command);
+	gchar* result = g_strdup_printf("X Change: %d pixels\nY Change: %d pixels\nTotal Change: %f pixels", xc, yc, change);
+	msgbox(result);
+	g_free(result);
 	return EXIT_SUCCESS;
 }
