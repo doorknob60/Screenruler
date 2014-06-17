@@ -1,2 +1,2 @@
-Requirements: zenity
-How to compile: gcc screenruler.c -lX11 -lm -o screenruler
+Requirements: not zenity :) ...either Gtk2 or Gtk3
+How to compile: gcc screenruler.c -Os -s `pkg-config gtk+-3.0 --cflags` `pkg-config gtk+-3.0 --libs` -lX11 -lm -o screenruler
